@@ -164,13 +164,17 @@ func loadFile(s3Svc *s3.S3, bucket string, folder string, fileName string, confi
 // checkS3Info.
 func checkS3Info(s3Info *S3Info) error {
 	switch s3Info.Type {
-	case s3InfoTypeKey:
-		if s3Info.Region == nil || s3Info.AccessKey == "" || s3Info.SecretKey == "" {
-			return errors.New("s3Info not enougth")
+	case s3InfoTypeRole:
+		if s3Info.Region == nil {
+			return errors.New("s3Info not region")
 		}
 	case s3InfoTypeEnv:
 		if s3Info.Region == nil {
 			return errors.New("s3Info not region")
+		}
+	case s3InfoTypeKey:
+		if s3Info.Region == nil || s3Info.AccessKey == "" || s3Info.SecretKey == "" {
+			return errors.New("s3Info not enougth")
 		}
 	default:
 		return errors.New("s3Info not type")
