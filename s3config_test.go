@@ -28,8 +28,8 @@ type (
 
 func TestBind(t *testing.T) {
 	// folder fileName from command line etc...
-	s3Info := NewS3Info("ap-northeast-1", "bucket", "folder", "config.yml", 10*time.Second)
-	//s3Info := NewS3InfoKey("ap-northeast-1", "access_key", "access_secret_key", "bucket", "folder", "fileName", 10*time.Second)
+	s3Info := NewS3InfoRole("ap-northeast-1", "bucket", "folder", "config.yml", 10*time.Second)
+	//s3Info := NewS3InfoKey("ap-northeast-1", "AWS_ACCESS_KEY", "AWS_SECRET_KEY", "bucket", "folder", "fileName", 10*time.Second)
 
 	myConfig := &Config{}
 

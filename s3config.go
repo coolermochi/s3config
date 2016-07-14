@@ -11,16 +11,20 @@ import (
 
 	"errors"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds"
+	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"net/http"
 )
 
 type s3InfoType int
 
 // s3InfoTypes.
 const (
-	s3InfoTypeKey s3InfoType = iota + 1
+	s3InfoTypeRole s3InfoType = iota + 1
 	s3InfoTypeEnv
+	s3InfoTypeKey
 )
 
 // minimum interval.
@@ -30,18 +34,30 @@ const (
 
 // S3Info(aws properties).
 type S3Info struct {
-	Type            s3InfoType
-	Region          *string
-	AccessKey       string
-	SecretAccessKey string
-	Bucket          string
-	Folder          string
-	FileName        string
-	Interval        time.Duration
+	Type      s3InfoType
+	Region    *string
+	AccessKey string
+	SecretKey string
+	Bucket    string
+	Folder    string
+	FileName  string
+	Interval  time.Duration
 }
 
 // NewS3Info set from server env or role.
-func NewS3Info(region string, bucket string, folder string, fileName string, interval time.Duration) *S3Info {
+func NewS3InfoRole(region string, bucket string, folder string, fileName string, interval time.Duration) *S3Info {
+	return &S3Info{
+		Type:     s3InfoTypeRole,
+		Region:   aws.String(region),
+		Bucket:   bucket,
+		Folder:   folder,
+		FileName: fileName,
+		Interval: interval,
+	}
+}
+
+// NewS3Info set from server env or role.
+func NewS3InfoEnv(region string, bucket string, folder string, fileName string, interval time.Duration) *S3Info {
 	return &S3Info{
 		Type:     s3InfoTypeEnv,
 		Region:   aws.String(region),
@@ -53,16 +69,16 @@ func NewS3Info(region string, bucket string, folder string, fileName string, int
 }
 
 // NewS3InfoKey set from credentials.csv.
-func NewS3InfoKey(region string, accessKey string, secretAccessKey string, bucket string, folder string, fileName string, interval time.Duration) *S3Info {
+func NewS3InfoKey(region string, accessKey string, secretKey string, bucket string, folder string, fileName string, interval time.Duration) *S3Info {
 	return &S3Info{
-		Type:            s3InfoTypeKey,
-		Region:          aws.String(region),
-		AccessKey:       accessKey,
-		SecretAccessKey: secretAccessKey,
-		Bucket:          bucket,
-		Folder:          folder,
-		FileName:        fileName,
-		Interval:        interval,
+		Type:      s3InfoTypeKey,
+		Region:    aws.String(region),
+		AccessKey: accessKey,
+		SecretKey: secretKey,
+		Bucket:    bucket,
+		Folder:    folder,
+		FileName:  fileName,
+		Interval:  interval,
 	}
 }
 
@@ -80,10 +96,17 @@ func Bind(s3Info *S3Info, config interface{}) error {
 	// create aws credentials
 	var creds *credentials.Credentials
 	switch s3Info.Type {
-	case s3InfoTypeKey:
-		creds = credentials.NewStaticCredentials(s3Info.AccessKey, s3Info.SecretAccessKey, "")
+	case s3InfoTypeRole:
+		ec2 := ec2metadata.New(session.New(), &aws.Config{
+			HTTPClient: &http.Client{Timeout: 10 * time.Second},
+		})
+		creds = credentials.NewCredentials(&ec2rolecreds.EC2RoleProvider{
+			Client: ec2,
+		})
 	case s3InfoTypeEnv:
 		creds = credentials.NewEnvCredentials()
+	case s3InfoTypeKey:
+		creds = credentials.NewStaticCredentials(s3Info.AccessKey, s3Info.SecretKey, "")
 	}
 
 	// create S3 service
@@ -142,7 +165,7 @@ func loadFile(s3Svc *s3.S3, bucket string, folder string, fileName string, confi
 func checkS3Info(s3Info *S3Info) error {
 	switch s3Info.Type {
 	case s3InfoTypeKey:
-		if s3Info.Region == nil || s3Info.AccessKey == "" || s3Info.SecretAccessKey == "" {
+		if s3Info.Region == nil || s3Info.AccessKey == "" || s3Info.SecretKey == "" {
 			return errors.New("s3Info not enougth")
 		}
 	case s3InfoTypeEnv:
