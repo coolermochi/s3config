@@ -1,0 +1,9 @@
+# up to S3
+server:
+  port: 8080
+
+mysql:
+  url: host:3306
+  schema: schema
+  user: hoge
+  pass: pass

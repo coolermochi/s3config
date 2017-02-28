@@ -11,41 +11,30 @@ type (
 		MySQL  *mysql  `yaml:"mysql"`
 	}
 	server struct {
-		CPU     int    `yaml:"cpu"`
 		Port    string `yaml:"port"`
-		Mode    string `yaml:"mode"`
-		LogFile string `yaml:"log_file"`
 	}
 	mysql struct {
 		URL      string `yaml:"url"`
 		Schema   string `yaml:"schema"`
 		User     string `yaml:"user"`
 		Pass     string `yaml:"pass"`
-		IdleConn int    `yaml:"idle_conn"`
-		MaxConn  int    `yaml:"max_conn"`
 	}
 )
 
 func TestBind(t *testing.T) {
 	// folder fileName from command line etc...
-	s3Info := NewS3InfoRole("ap-northeast-1", "bucket", "folder", "config.yml", 10*time.Second)
-	//s3Info := NewS3InfoKey("ap-northeast-1", "AWS_ACCESS_KEY", "AWS_SECRET_KEY", "bucket", "folder", "fileName", 10*time.Second)
+	s3Info := NewS3InfoRole("ap-northeast-1", "bucket", "folder", "sample.yml", 10*time.Minute)
+	//s3Info := NewS3InfoKey("ap-northeast-1", "AWS_ACCESS_KEY", "AWS_SECRET_KEY", "bucket", "folder", "fileName", 10*time.Minute)
 
-	myConfig := &Config{}
+	config := &Config{}
 
 	// bind config
-	if err := Bind(s3Info, myConfig); err != nil || myConfig.Server == nil || myConfig.MySQL == nil {
+	if err := Bind(s3Info, config); err != nil || config.Server == nil || config.MySQL == nil {
 		t.Errorf("error TestBind %s", err.Error())
 		return
 	}
 
 	// log
-	t.Logf("Server %+v\n", myConfig.Server)
-	t.Logf("MySQL %+v\n", myConfig.MySQL)
-
-	// edit now s3 file
-	time.Sleep(30 * time.Second)
-
-	t.Logf("Server %+v\n", myConfig.Server)
-	t.Logf("MySQL %+v\n", myConfig.MySQL)
+	t.Logf("Server %+v\n", config.Server)
+	t.Logf("MySQL %+v\n", config.MySQL)
 }

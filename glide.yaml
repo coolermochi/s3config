@@ -1,9 +1,0 @@
-package: github.com/coolermochi/s3config
-import:
-- package: github.com/aws/aws-sdk-go
-  subpackages:
-  - aws
-  - aws/credentials
-  - aws/session
-  - service/s3
-- package: gopkg.in/yaml.v2
