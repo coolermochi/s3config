@@ -42,7 +42,7 @@ func TestBind(t *testing.T) {
 
 	// bind config
 	if err := Bind(s3Info, config); err != nil {
-		t.Fatalf("error TestBind %s", err.Error())
+		t.Fatalf("error Bind %s", err.Error())
 		return
 	}
 

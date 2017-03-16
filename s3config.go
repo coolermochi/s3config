@@ -157,10 +157,15 @@ func Bind(s3Info *S3Info, config interface{}) error {
 
 // LoadFile.
 // load yaml file bind config.
-func loadFile(s3Svc *s3.S3, bucket string, folder string, fileName string, config interface{}) error {
+func loadFile(s3Svc *s3.S3, bucket string, folder string, file string, config interface{}) error {
 
 	// get file
-	key := folder + "/" + fileName // full fileName
+	var key string
+	if folder != "" {
+		key = folder + "/" + file // full fileName
+	} else {
+		key = file
+	}
 	params := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
