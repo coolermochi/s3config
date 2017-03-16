@@ -11,26 +11,38 @@ type (
 		MySQL  *mysql  `yaml:"mysql"`
 	}
 	server struct {
-		Port    string `yaml:"port"`
+		Port string `yaml:"port"`
 	}
 	mysql struct {
-		URL      string `yaml:"url"`
-		Schema   string `yaml:"schema"`
-		User     string `yaml:"user"`
-		Pass     string `yaml:"pass"`
+		URL    string `yaml:"url"`
+		Schema string `yaml:"schema"`
+		User   string `yaml:"user"`
+		Pass   string `yaml:"pass"`
 	}
 )
 
 func TestBind(t *testing.T) {
-	// folder fileName from command line etc...
-	s3Info := NewS3InfoRole("ap-northeast-1", "bucket", "folder", "sample.yml", 10*time.Minute)
-	//s3Info := NewS3InfoKey("ap-northeast-1", "AWS_ACCESS_KEY", "AWS_SECRET_KEY", "bucket", "folder", "fileName", 10*time.Minute)
+	// type role
+	//s3Info, err := New(TypeRole, "ap-northeast-1", &S3Bucket{"bucket", "folder", "sample.yml"})
+	// type env
+	//s3Info, err := New(TypeEnv, "ap-northeast-1", &S3Bucket{"bucket", "folder", "sample.yml"})
+	// type key
+	s3Info, err := New(TypeKey,
+		"ap-northeast-1",
+		&S3Bucket{"bucket", "folder", "sample.yml"},
+		Keys("accessKey", "secretKey"),
+		Interval(10*time.Minute),
+	)
+	if err != nil {
+		t.Fatalf("error Create S3Info %s", err.Error())
+		return
+	}
 
 	config := &Config{}
 
 	// bind config
-	if err := Bind(s3Info, config); err != nil || config.Server == nil || config.MySQL == nil {
-		t.Errorf("error TestBind %s", err.Error())
+	if err := Bind(s3Info, config); err != nil {
+		t.Fatalf("error TestBind %s", err.Error())
 		return
 	}
 
