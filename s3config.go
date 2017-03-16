@@ -35,13 +35,13 @@ const (
 type S3Info struct {
 	Type   Type
 	Region *string
-	*S3Bucket
+	*Bucket
 	AccessKey string
 	SecretKey string
 	Interval  time.Duration
 }
 
-type S3Bucket struct {
+type Bucket struct {
 	Name   string
 	Folder string
 	File   string
@@ -50,7 +50,7 @@ type S3Bucket struct {
 type Option func(*S3Info) error
 
 // New.
-func New(typo Type, region string, bucket *S3Bucket, opts ...Option) (*S3Info, error) {
+func New(typo Type, region string, bucket *Bucket, opts ...Option) (*S3Info, error) {
 
 	if bucket == nil || bucket.Name == "" || bucket.File == "" {
 		return nil, errors.New("Empty Bucket data")
@@ -59,7 +59,7 @@ func New(typo Type, region string, bucket *S3Bucket, opts ...Option) (*S3Info, e
 	s3Info := &S3Info{
 		Type:   typo,
 		Region: aws.String(region),
-		S3Bucket: &S3Bucket{
+		Bucket: &Bucket{
 			Name:   bucket.Name,
 			Folder: bucket.Folder,
 			File:   bucket.File,
