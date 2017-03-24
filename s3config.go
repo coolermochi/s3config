@@ -52,18 +52,14 @@ type Option func(*S3Info) error
 // New.
 func New(typo Type, region string, bucket Bucket, opts ...Option) (*S3Info, error) {
 
-	if bucket == nil || bucket.Name == "" || bucket.File == "" {
+	if bucket.Name == "" || bucket.File == "" {
 		return nil, errors.New("Empty Bucket data")
 	}
 
 	s3Info := &S3Info{
 		Type:   typo,
 		Region: aws.String(region),
-		Bucket: Bucket{
-			Name:   bucket.Name,
-			Folder: bucket.Folder,
-			File:   bucket.File,
-		},
+		Bucket: &bucket,
 	}
 
 	for _, opt := range opts {
