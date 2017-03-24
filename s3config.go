@@ -50,7 +50,7 @@ type Bucket struct {
 type Option func(*S3Info) error
 
 // New.
-func New(typo Type, region string, bucket *Bucket, opts ...Option) (*S3Info, error) {
+func New(typo Type, region string, bucket Bucket, opts ...Option) (*S3Info, error) {
 
 	if bucket == nil || bucket.Name == "" || bucket.File == "" {
 		return nil, errors.New("Empty Bucket data")
@@ -59,7 +59,7 @@ func New(typo Type, region string, bucket *Bucket, opts ...Option) (*S3Info, err
 	s3Info := &S3Info{
 		Type:   typo,
 		Region: aws.String(region),
-		Bucket: &Bucket{
+		Bucket: Bucket{
 			Name:   bucket.Name,
 			Folder: bucket.Folder,
 			File:   bucket.File,
