@@ -23,13 +23,13 @@ type (
 
 func TestBind(t *testing.T) {
 	// type role
-	//s3Info, err := New(TypeRole, "ap-northeast-1", Bucket{"bucket", "folder", "sample.yml"})
+	//s3Info, err := New(TypeRole, "ap-northeast-1", Bucket{"bucket", "path", "sample.yml"})
 	// type env
-	//s3Info, err := New(TypeEnv, "ap-northeast-1", Bucket{"bucket", "folder", "sample.yml"})
+	//s3Info, err := New(TypeEnv, "ap-northeast-1", Bucket{"bucket", "path", "sample.yml"})
 	// type key
 	s3Info, err := New(TypeKey,
 		"ap-northeast-1",
-		Bucket{"bucket", "folder", "sample.yml"},
+		Bucket{"bucket", "path", "sample.yml"},
 		Keys("accessKey", "secretKey"),
 		Interval(10*time.Minute),
 	)

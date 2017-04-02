@@ -42,9 +42,9 @@ type S3Info struct {
 }
 
 type Bucket struct {
-	Name   string
-	Folder string
-	File   string
+	Name string
+	Path string
+	File string
 }
 
 type Option func(*S3Info) error
@@ -133,7 +133,7 @@ func Bind(s3Info *S3Info, config interface{}) error {
 	s3Svc := s3.New(sess)
 
 	// load file
-	if err := loadFile(s3Svc, s3Info.Name, s3Info.Folder, s3Info.File, config); err != nil {
+	if err := loadFile(s3Svc, s3Info.Name, s3Info.Path, s3Info.File, config); err != nil {
 		return err
 	}
 
@@ -142,7 +142,7 @@ func Bind(s3Info *S3Info, config interface{}) error {
 		for {
 			// interval
 			time.Sleep(s3Info.Interval)
-			if err := loadFile(s3Svc, s3Info.Name, s3Info.Folder, s3Info.File, config); err != nil {
+			if err := loadFile(s3Svc, s3Info.Name, s3Info.Path, s3Info.File, config); err != nil {
 				fmt.Println(err.Error())
 			}
 		}
@@ -153,12 +153,12 @@ func Bind(s3Info *S3Info, config interface{}) error {
 
 // LoadFile.
 // load yaml file bind config.
-func loadFile(s3Svc *s3.S3, bucket string, folder string, file string, config interface{}) error {
+func loadFile(s3Svc *s3.S3, bucket string, path string, file string, config interface{}) error {
 
 	// get file
 	var key string
-	if folder != "" {
-		key = folder + "/" + file // full fileName
+	if path != "" {
+		key = path + "/" + file // full fileName
 	} else {
 		key = file
 	}
